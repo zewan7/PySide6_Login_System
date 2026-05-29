@@ -1,7 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy
-from sqlalchemy import Column, Integer, String, BLOB
-from sqlalchemy.dialects import mysql
+from sqlalchemy import Column, Integer, String, BLOB, DateTime
 from sqlalchemy.orm import sessionmaker
 import os
 import sys
@@ -11,8 +10,6 @@ from config import config
 
 engine = sqlalchemy.create_engine(config["db_url"])
 Session = sessionmaker(bind=engine)
-session = Session()
-DateTime = mysql.DATETIME
 
 Base = declarative_base()
 
@@ -27,6 +24,5 @@ class UserTable(Base):
     create_time = Column(DateTime)
     update_time = Column(DateTime)
 
-
-if __name__ == "__main__":
-    Base.metadata.create_all(engine)
+# 自动创建所有表（如果数据库中已存在对应表，则会自动忽略不会重复创建）
+Base.metadata.create_all(engine)

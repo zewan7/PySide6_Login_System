@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QTimer, QThread, Signal
 from ..UI_all.Ui_register import Ui_Form as ui_register
-from ..models.create_tables import session, UserTable
+from ..models.create_tables import Session, UserTable
 from ..utls.email_verification import validate_email_with_lib
 from ..utls.send_email import send_email_captcha
 from ..utls.get_captcha import get_captcha
@@ -112,9 +112,14 @@ class RegisterHander(QWidget):
         now_time = datetime.now()
         hash_password = hash_pwd.hash_password(password)
         new_user = UserTable(email=email, name=name, password=hash_password, create_time=now_time, update_time=now_time)
-        session.add(new_user)
-        session.commit()
-        session.close()
+        
+        session = Session()
+        try:
+            session.add(new_user)
+            session.commit()
+        finally:
+            session.close()
+            
         print(f"{email} 用户注册成功")
         # 清空输入
         self.clear_register_lineEdit()
@@ -132,7 +137,12 @@ class SendEmailWorkerThread(QThread):
         self.email = email
 
     def run(self):
-        email_exist = session.query(UserTable).filter_by(email=self.email).first()
+        session = Session()
+        try:
+            email_exist = session.query(UserTable).filter_by(email=self.email).first()
+        finally:
+            session.close()
+            
         if email_exist:
             self.captcha_sent.emit(False, "Email已注册")
             return

@@ -27,6 +27,9 @@ class EmittingStr(QtCore.QObject):
     def write(self, text):
         # 调用信号传入文本
         self.textWritten.emit(str(text))
+        
+    def flush(self):
+        pass
 
 
 class MyMainpage(QMainWindow):

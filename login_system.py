@@ -5,7 +5,7 @@ import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(current_dir)
 sys.path.append(current_dir)
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, QtMsgType, qInstallMessageHandler
 from PySide6.QtWidgets import QApplication, QStackedLayout, QWidget, QVBoxLayout
 from PySide6.QtGui import QIcon
 from app.utls.api_hash import PasswordHasher
@@ -14,8 +14,8 @@ from app.handlers.register import RegisterHander
 from app.handlers.repassword import RePasswordHander
 # ==================GUI导入=============================
 # from Image_GUI.main_page import MyMainpage
-# from Excel_Main_GUI.MergeExcel import MyMainpage
-from Modern_GUI.main import MainWindow as MyMainpage
+from Excel_Main_GUI.MergeExcel import MyMainpage
+# from Modern_GUI.main import MainWindow as MyMainpage
 
 
 class MyWindow(QWidget):
@@ -62,8 +62,17 @@ class MyWindow(QWidget):
             self.main_window.show()
 
 
+def custom_qt_message_handler(mode, context, message):
+    # 如果是这个特定的 D3D11 报错，直接忽略，不打印到控制台
+    if "Failed to resize D3D11 swapchain" in message:
+        return
+    # 其他的按照原样可以不拦截，如果不想打印任何Qt内部警告，可以把下面这行注释掉
+    # print(message)
+
 def main():
     app = QApplication(sys.argv)
+    # 安装自定义的消息拦截器
+    qInstallMessageHandler(custom_qt_message_handler)
     window = MyWindow()
     window.show()
     sys.exit(app.exec())

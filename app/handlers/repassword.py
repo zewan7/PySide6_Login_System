@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QTimer, QThread, Signal
 from ..UI_all.Ui_rePwd import Ui_Form as ui_rePwd
-from ..models.create_tables import session, UserTable
+from ..models.create_tables import Session, UserTable
 from ..utls.send_email import send_email_captcha
 from ..utls.get_captcha import get_captcha
 from ..utls.api_hash import PasswordHasher
@@ -97,21 +97,24 @@ class RePasswordHander(QWidget):
             self.repwd_ui.label_reLed.setText(msg)
             return
         if re_captcha == re_redis_captcha:
-            re_user = session.query(UserTable).filter_by(email=email_text).first()
-            if re_user:
-                hash_password = hash_pwd.hash_password(re_password)
-                re_user.password = hash_password
-                re_user.update_time = datetime.now()
-                session.commit()
+            session = Session()
+            try:
+                re_user = session.query(UserTable).filter_by(email=email_text).first()
+                if re_user:
+                    hash_password = hash_pwd.hash_password(re_password)
+                    re_user.password = hash_password
+                    re_user.update_time = datetime.now()
+                    session.commit()
+                    print("密码修改成功")
+                    # 清空输入
+                    self.clear_repwd_lineEdit()
+                    self.parent.setWindowTitle("登陆")
+                    # 跳转到登陆
+                    self.parent.stacked_layout.setCurrentIndex(0)
+                else:
+                    self.repwd_ui.label_reLed.setText("查不到此邮箱")
+            finally:
                 session.close()
-                print("密码修改成功")
-                # 清空输入
-                self.clear_repwd_lineEdit()
-                self.parent.setWindowTitle("登陆")
-                # 跳转到登陆
-                self.parent.stacked_layout.setCurrentIndex(0)
-            else:
-                self.repwd_ui.label_reLed.setText("查不到此邮箱")
         else:
             self.repwd_ui.label_reLed.setText("验证码不正确")
 
@@ -124,7 +127,12 @@ class CheckEmailExistsThread(QThread):
         self.email = email
 
     def run(self):
-        re_user = session.query(UserTable).filter_by(email=self.email).first()
+        session = Session()
+        try:
+            re_user = session.query(UserTable).filter_by(email=self.email).first()
+        finally:
+            session.close()
+            
         if not re_user:
             self.send_sig.emit(False, "输入的邮箱不存在")
             return
