@@ -3,7 +3,7 @@ import os
 import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(current_dir)
+# 坚决不能在模块全局使用 os.chdir()，否则会导致打包后抛出 FileNotFoundError，并且会破坏主程序的相对路径！
 sys.path.append(current_dir)
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Signal, QTimer, QDateTime
@@ -38,15 +38,14 @@ class MyMainpage(QMainWindow):
         self.parent = parent
         self.user_inof = user_inof
         self.name = self.user_inof.get('user_name', '游客')
-        # 设置工作目录
+        # 坚决不使用 os.chdir()，使用绝对路径拼接
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        os.chdir(current_dir)
         sys.path.append(current_dir)
 
         # 主界面
         self.ui_main = ui_mian()
         self.ui_main.setupUi(self)
-        self.setWindowIcon(QIcon('./ico/猫.jpg'))
+        self.setWindowIcon(QIcon(os.path.join(current_dir, 'ico', '猫.jpg')))
         self.time_q = QTimer(self)
         self.time_q.timeout.connect(self.update_time)
         self.time_q.start(1000)
@@ -55,7 +54,7 @@ class MyMainpage(QMainWindow):
 
     def run(self):
         # 设置Button图片
-        self.ui_main.pushButton_6.setIcon(QIcon('./ico/猫咪.jpg'))
+        self.ui_main.pushButton_6.setIcon(QIcon(os.path.join(current_dir, 'ico', '猫咪.jpg')))
         # 设置图片大小
         self.ui_main.pushButton_6.setIconSize(QSize(350, 221))
         # 图片
@@ -146,7 +145,7 @@ class PathExcel(QMainWindow):
         super().__init__()
         self.ui = ui_excel()
         self.ui.setupUi(self)
-        self.setWindowIcon(QIcon('ico/猫.jpg'))
+        self.setWindowIcon(QIcon(os.path.join(current_dir, 'ico', '猫.jpg')))
         path = "格式如：C:\\Users\\ee\\Desktop\\文件夹\\excel演示文件夹"
         # 设置lable标签文字演示字段
         self.ui.label_1.setText(path)
@@ -195,7 +194,7 @@ class PathExcelCsv(QMainWindow):
         super().__init__()
         self.ui = ui_path()
         self.ui.setupUi(self)
-        self.setWindowIcon(QIcon('ico/猫.jpg'))
+        self.setWindowIcon(QIcon(os.path.join(current_dir, 'ico', '猫.jpg')))
         # 下面将输出重定向到textEdit中
         sys.stdout = EmittingStr()
         sys.stdout.textWritten.connect(self.outputWritten)
@@ -270,7 +269,7 @@ class Suggestion(QMainWindow):
         # concat_file = Concat_File()
         self.ui = ui_opinion()
         self.ui.setupUi(self)
-        self.setWindowIcon(QIcon('ico/猫.jpg'))
+        self.setWindowIcon(QIcon(os.path.join(current_dir, 'ico', '猫.jpg')))
         self.clicked_button_5()
 
     def clicked_button_5(self):

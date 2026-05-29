@@ -19,7 +19,7 @@ import os
 import platform
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(current_dir)
+# 坚决不使用 os.chdir()，使用绝对路径拼接
 sys.path.append(current_dir)
 
 # IMPORT / GUI AND MODULES AND WIDGETS
@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         global widgets
         widgets = self.ui
-        self.setWindowIcon(QIcon("icon.ico"))
+        self.setWindowIcon(QIcon(os.path.join(current_dir, "icon.ico")))
 
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ class MainWindow(QMainWindow):
         # SET CUSTOM THEME
         # ///////////////////////////////////////////////////////////////
         useCustomTheme = False
-        themeFile = "themes\py_dracula_light.qss"
+        themeFile = os.path.join(current_dir, "themes", "py_dracula_light.qss")
 
         # SET THEME AND HACKS
         if useCustomTheme:
@@ -167,6 +167,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("icon.ico"))
+    app.setWindowIcon(QIcon(os.path.join(current_dir, "icon.ico")))
     window = MainWindow()
     sys.exit(app.exec())

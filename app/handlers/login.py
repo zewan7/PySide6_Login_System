@@ -32,7 +32,12 @@ class LoginHander(QWidget):
         self.login_signal.connect(self.on_login_result)
         self.current_img_index = 0
         try:
-            self.imgs_list = os.listdir(IMGS_PATH)
+            raw_list = os.listdir(IMGS_PATH)
+            valid_exts = {'.jpg', '.jpeg', '.png', '.gif', '.mng', '.mp4', '.wmv', '.avi'}
+            self.imgs_list = [
+                f for f in raw_list 
+                if os.path.isfile(os.path.join(IMGS_PATH, f)) and os.path.splitext(f)[1].lower() in valid_exts
+            ]
         except FileNotFoundError:
             print("图片列表未配置")
             self.imgs_list = []

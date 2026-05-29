@@ -11,11 +11,15 @@ def validate_password(password):
         # ('包含至少一个特殊字符', lambda p: any(not c.isalnum() and not c.isspace() for c in p)),
     ]
 
+    failed_rules = []
     # 检查密码是否满足所有规则
     for rule_name, check in rules:
         if not check(password):
-            return False, f"密码不符合规则：{rule_name}"
+            failed_rules.append(rule_name)
+            
+    if failed_rules:
+        return False, "密码要求：至少8个字符，且必须同时包含字母和数字"
 
-            # 所有规则都通过
+    # 所有规则都通过
     return True, "密码有效"
 

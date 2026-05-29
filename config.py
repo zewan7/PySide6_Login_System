@@ -29,18 +29,25 @@ config = {
     },
 
     "email": {
-        "host": "smtp.qq.com",  # QQ邮箱，其他邮箱自行更换
+        "host": "smtp.qq.com",
         "smtp_ssl": True,
         "port": 465,
-        "user": "xxxxxx@qq.com",# 替换你的邮箱
-        "password": "xxxxxx" # 替换你的邮箱授权码
+        "user": "cukuangren@qq.com",
+        "password": "mebjltnndclpbhjh"
     },
 }
 
 config["redis_url"] = "redis://:{password}@{host}:{port}/1".format(**config["redis"])
 
 if USE_SQLITE:
-    sqlite_path = os.path.join(os.path.dirname(__file__), "local_data.db")
+    import sys
+    # 获取真正的运行目录（兼容 PyInstaller 打包后的环境）
+    if getattr(sys, 'frozen', False):
+        base_dir = os.path.dirname(sys.executable)
+    else:
+        base_dir = os.path.dirname(__file__)
+        
+    sqlite_path = os.path.join(base_dir, "local_data.db")
     config["db_url"] = f"sqlite:///{sqlite_path}"
 else:
     config["db_url"] = "mysql+pymysql://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4".format(**config["db_params"])

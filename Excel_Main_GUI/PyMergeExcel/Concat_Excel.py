@@ -2,7 +2,7 @@ import os
 import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(current_dir)
+# 坚决不能在全局使用 os.chdir()，否则会导致打包运行崩溃
 # 确保modules可以被导入
 sys.path.append(current_dir)
 import pathlib
